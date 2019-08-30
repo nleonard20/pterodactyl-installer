@@ -185,7 +185,7 @@ function set_folder_permissions {
     chown -R www-data:www-data *
   elif [ "$OS" == "centos" ] && [ "$WEBSERVER" == "nginx" ]; then
     chown -R nginx:nginx *
-  elif [ "$OS" == "centos" ] && [ "$WEBSERVER" == "apache" ]; then
+  elif [ "$OS" == "centos" ] && [ "$WEBSERVER" == "apache2" ]; then
     chown -R apache:apache *
   else
     print_error "Invalid webserver and OS setup."
@@ -265,7 +265,15 @@ function ubuntu18_dep {
   apt update
 
   # Install Dependencies
-  apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
+
+  if [ "$WEBSERVER" == "nginx" ]; then
+  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
+  elif [ "$WEBSERVER" == "apache2" ]; then
+  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server apache2 curl tar unzip git redis-server
+  else
+    print_error "Invalid webserver."
+    exit 1
+  fi
 
   echo "* Dependencies for Ubuntu installed!"
 }
@@ -285,7 +293,15 @@ function ubuntu16_dep {
   apt update
 
   # Install Dependencies
-  apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
+
+  if [ "$WEBSERVER" == "nginx" ]; then
+  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
+  elif [ "$WEBSERVER" == "apache2" ]; then
+  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server apache2 curl tar unzip git redis-server
+  else
+    print_error "Invalid webserver."
+    exit 1
+  fi
 
   echo "* Dependencies for Ubuntu installed!"
 }
@@ -311,7 +327,14 @@ function debian_dep {
   apt update
 
   # Install Dependencies
-  apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
+  if [ "$WEBSERVER" == "nginx" ]; then
+  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
+  elif [ "$WEBSERVER" == "apache2" ]; then
+  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server apache2 curl tar unzip git redis-server
+  else
+    print_error "Invalid webserver."
+    exit 1
+  fi
 
   echo "* Dependencies for Debian installed!"
 }
@@ -331,7 +354,14 @@ function centos_dep {
   curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
 
   # install dependencies
-  yum -y install install php72u-php php72u-common php72u-fpm php72u-cli php72u-json php72u-mysqlnd php72u-mcrypt php72u-gd php72u-mbstring php72u-pdo php72u-zip php72u-bcmath php72u-dom php72u-opcache mariadb-server nginx curl tar unzip git redis
+  if [ "$WEBSERVER" == "nginx" ]; then
+  	yum -y install install php72u-php php72u-common php72u-fpm php72u-cli php72u-json php72u-mysqlnd php72u-mcrypt php72u-gd php72u-mbstring php72u-pdo php72u-zip php72u-bcmath php72u-dom php72u-opcache mariadb-server nginx curl tar unzip git redis
+  elif [ "$WEBSERVER" == "apache2" ]; then
+  	yum -y install install php72u-php php72u-common php72u-fpm php72u-cli php72u-json php72u-mysqlnd php72u-mcrypt php72u-gd php72u-mbstring php72u-pdo php72u-zip php72u-bcmath php72u-dom php72u-opcache mariadb-server apache2 curl tar unzip git redis
+  else
+    print_error "Invalid webserver."
+    exit 1
+  fi
 
   # enable services
   systemctl enable mariadb
@@ -489,7 +519,7 @@ function perform_install {
   # perform webserver configuration
   if [ "$WEBSERVER" == "nginx" ]; then
     configure_nginx
-  elif [ "$WEBSERVER" == "apache" ]; then
+  elif [ "$WEBSERVER" == "apache2" ]; then
     configure_apache
   else
     print_error "Invalid webserver."
