@@ -10,16 +10,12 @@ List of supported installation setups for panel and daemon (installations suppor
 
 ### Supported panel operating systems and webservers
 
-| Operating System  | Version | nginx support      | Apache support |
-| ----------------- | ------- | ------------------ | -------------- |
-| Ubuntu            | 14.04   | :red_circle:       | :red_circle:   |
-|                   | 16.04   | :white_check_mark: | :red_circle:   |
-|                   | 18.04   | :white_check_mark: | :red_circle:   |
-| Debian            | 8       | :white_check_mark: | :red_circle:   |
-|                   | 9       | :white_check_mark: | :red_circle:   |
-|                   | 10      | :red_circle: *     | :red_circle:   |
-| CentOS            | 6       | :red_circle:       | :red_circle:   |
-|                   | 7       | :red_circle: **    | :red_circle:   |
+| Operating System  | Version | nginx support      | Apache support       |
+| ----------------- | ------- | ------------------ | --------------       |
+| Ubuntu            | 16.04   | :white_check_mark: | :white_check_mark:   |
+|                   | 18.04   | :white_check_mark: | :white_check_mark:   |
+| Debian            | 8       | :white_check_mark: | :white_check_mark:   |
+|                   | 9       | :white_check_mark: | :white_check_mark:   |
 
 ### Supported daemon operating systems
 
@@ -30,13 +26,9 @@ List of supported installation setups for panel and daemon (installations suppor
 |                   | 18.04   | :white_check_mark: |
 | Debian            | 8       | :red_circle:       |
 |                   | 9       | :white_check_mark: |
-|                   | 10      | :red_circle:*      |
+|                   | 10      | :red_circle:       |
 | CentOS            | 6       | :red_circle:       |
 |                   | 7       | :white_check_mark: |
-
-_* Debian 10 is not listed as officially supported by Pterodactyl yet._
-
-_** CentOS 7 is only supported by this script on daemon installations, not panel._
 
 # Using the installation scripts
 
