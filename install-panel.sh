@@ -331,6 +331,9 @@ function debian_dep {
   	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
   elif [ "$WEBSERVER" == "apache2" ]; then
   	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server apache2 curl tar unzip git redis-server
+    a2enmod proxy_fcgi setenvif
+    a2enconf php7.2-fpm
+    systemctl restart apache2
   else
     print_error "Invalid webserver."
     exit 1
@@ -452,6 +455,7 @@ function configure_apache {
   else
       # remove default config
       rm -rf /etc/apache2/sites-available/000-default.conf
+      rm -rf /etc/apache2/sites-enabled/000-default.conf
 
       # download new config
       curl -o /etc/apache2/sites-available/pterodactyl.conf $CONFIGS_URL/$DL_FILE
