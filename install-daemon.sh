@@ -87,6 +87,8 @@ function check_os_comp {
   elif [ "$OS" == "debian" ]; then
     if [ "$OS_VERSION" == "9" ]; then
       SUPPORTED=true
+    elif [ "$OS_VERSION" == "10" ]; then
+      SUPPORTED=true
     else
       SUPPORTED=false
     fi
