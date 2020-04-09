@@ -34,6 +34,7 @@ List of supported installation setups for panel and daemon (installations suppor
 
 Using the Pterodactyl Panel installation script:
 
+`apt install sudo curl python`
 `bash <(curl -s https://raw.githubusercontent.com/valkam08/pterodactyl-installer/master/install-panel.sh)`
 
 Using the Pterodactyl Daemon installation script:
