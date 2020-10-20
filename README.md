@@ -27,9 +27,8 @@ List of supported installation setups for panel and daemon (installations suppor
 |                   | 20.04   | :white_check_mark: |
 | Debian            | 9       | :white_check_mark: |
 |                   | 10      | :white_check_mark: |
-|                   | 10      | :red_circle:       |
-| CentOS            | 6       | :red_circle:       |
-|                   | 7       | :white_check_mark: |
+| CentOS            | 7       | :white_check_mark: |
+|                   | 8       | :white_check_mark: |
 
 # Using the installation scripts
 
