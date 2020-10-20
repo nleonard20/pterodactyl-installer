@@ -48,9 +48,6 @@ MYSQL_DB="pterodactyl"
 MYSQL_USER="pterodactyl"
 MYSQL_PASSWORD="somePassword"
 
-# asume SSL
-ASSUME_SSL=false
-
 # DL urls
 PANEL_URL="https://github.com/pterodactyl/panel/releases/download/$VERSION/panel.tar.gz"
 CONFIGS_URL="https://raw.githubusercontent.com/valkam08/pterodactyl-installer/master/configs"
@@ -87,17 +84,15 @@ function detect_os_version {
 
 function check_os_comp {
   if [ "$OS" == "ubuntu" ]; then
-    if [ "$OS_VERSION" == "16" ]; then
+    if [ "$OS_VERSION" == "18" ]; then
       SUPPORTED=true
-    elif [ "$OS_VERSION" == "18" ]; then
+    elif [ "$OS_VERSION" == "20" ]; then
       SUPPORTED=true
     else
       SUPPORTED=false
     fi
   elif [ "$OS" == "debian" ]; then
-    if [ "$OS_VERSION" == "8" ]; then
-      SUPPORTED=true
-    elif [ "$OS_VERSION" == "9" ]; then
+    if [ "$OS_VERSION" == "9" ]; then
       SUPPORTED=true
     elif [ "$OS_VERSION" == "10" ]; then
       SUPPORTED=true
@@ -106,8 +101,9 @@ function check_os_comp {
     fi
   elif [ "$OS" == "centos" ]; then
     if [ "$OS_VERSION" == "7" ]; then
-      # has not been fully tested yet to work, but will hopefully be soon
-      SUPPORTED=false
+      SUPPORTED=true
+    elif [ "$OS_VERSION" == "8" ]; then
+      SUPPORTED=true
     else
       SUPPORTED=false
     fi
@@ -198,14 +194,7 @@ function set_folder_permissions {
 # insert cronjob
 function insert_cronjob {
   echo "* Installing cronjob.. "
-
-  # removed alternate method
-  #crontab -l > mycron
-  #echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1" >> mycron
-  #crontab mycron
-  #rm mycron
   crontab -l | { cat; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1"; } | crontab -
-
   echo "* Cronjob installed!"
 }
 
@@ -253,14 +242,13 @@ function apt_update {
   apt update -y && apt upgrade -y
 }
 
-function ubuntu18_dep {
+function ubuntu20_dep {
   echo "* Installing dependencies for Ubuntu 18.."
 
   # Add "add-apt-repository" command
   apt -y install software-properties-common
 
   # Add additional repositories for PHP, Redis, and MariaDB
-  add-apt-repository -y ppa:chris-lea/redis-server
   curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
 
   # Update repositories list
@@ -269,9 +257,9 @@ function ubuntu18_dep {
   # Install Dependencies
 
   if [ "$WEBSERVER" == "nginx" ]; then
-  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
+  	apt -y install php7.4 php7.4-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx curl tar unzip zip git
   elif [ "$WEBSERVER" == "apache2" ]; then
-  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server apache2 curl tar unzip git redis-server
+  	apt -y install php7.4 php7.4-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server apache2 curl tar unzip zip git
   else
     print_error "Invalid webserver."
     exit 1
@@ -280,15 +268,14 @@ function ubuntu18_dep {
   echo "* Dependencies for Ubuntu installed!"
 }
 
-function ubuntu16_dep {
-  echo "* Installing dependencies for Ubuntu 16.."
+function ubuntu18_dep {
+  echo "* Installing dependencies for Ubuntu 18.."
 
   # Add "add-apt-repository" command
   apt -y install software-properties-common
 
-  # Add additional repositories for PHP, Redis, and MariaDB
-  LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-  add-apt-repository -y ppa:chris-lea/redis-server
+  # Add additional repositories for PHP, Redis, and MariaDBInstall Dependencies
+  sudo add-apt-repository ppa:ondrej/php
   curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
 
   # Update repositories list
@@ -297,9 +284,9 @@ function ubuntu16_dep {
   # Install Dependencies
 
   if [ "$WEBSERVER" == "nginx" ]; then
-  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
+  	apt -y install php7.4 php7.4-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx curl tar unzip zip git
   elif [ "$WEBSERVER" == "apache2" ]; then
-  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server apache2 curl tar unzip git redis-server
+  	apt -y install php7.4 php7.4-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server apache2 curl tar unzip zip git
   else
     print_error "Invalid webserver."
     exit 1
@@ -316,7 +303,7 @@ function debian_dep {
 
   # install PHP 7.2 using Sury's rep instead of PPA
   # this guide shows how: https://vilhelmprytz.se/2018/08/22/install-php72-on-Debian-8-and-9.html 
-  apt install ca-certificates apt-transport-https lsb-release -y
+  apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg lsb-release
   sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
   echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
 
@@ -330,12 +317,12 @@ function debian_dep {
 
   # Install Dependencies
   if [ "$WEBSERVER" == "nginx" ]; then
-  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server nginx curl tar unzip git redis-server
+  	apt -y install php7.4 php7.4-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx curl tar unzip zip git
   elif [ "$WEBSERVER" == "apache2" ]; then
-  	apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip mariadb-server apache2 curl tar unzip git redis-server
+  	apt -y install php7.4 php7.4-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server apache2 curl tar unzip zip git
     sudo a2enmod proxy_fcgi setenvif
     sudo a2enmod rewrite
-    sudo a2enconf php7.2-fpm
+    sudo a2enconf php7.4-fpm
     systemctl restart apache2
   else
     print_error "Invalid webserver."
@@ -403,11 +390,7 @@ function ubuntu_universedep {
 function configure_nginx {
   echo "* Configuring nginx .."
 
-  if [ "$ASSUME_SSL" == true ]; then
-    DL_FILE="nginx_ssl.conf"
-  else
-    DL_FILE="nginx.conf"
-  fi
+  DL_FILE="nginx.conf"
 
   if [ "$OS" == "centos" ]; then
       # remove default config
@@ -439,12 +422,8 @@ function configure_nginx {
 
 function configure_apache {
   echo "* Configuring apache2 .."
-
-  if [ "$ASSUME_SSL" == true ]; then
-    DL_FILE="apache2_ssl.conf"
-  else
-    DL_FILE="apache2.conf"
-  fi
+    
+  DL_FILE="apache2.conf"
 
   if [ "$OS" == "centos" ]; then
       # remove default config
@@ -488,8 +467,8 @@ function perform_install {
     # different dependencies depending on if it's 18 or 16
     if [ "$OS_VERSION" == "18" ]; then
       ubuntu18_dep
-    elif [ "$OS_VERSION" == "16" ]; then
-      ubuntu16_dep
+    elif [ "$OS_VERSION" == "20" ]; then
+      ubuntu20_dep
     else
       print_error "Unsupported version of Ubuntu."
       exit 1
@@ -604,21 +583,6 @@ function main {
   read FQDN
 
   echo ""
-
-  echo "* This installer does not configure Let's Encrypt, but depending on if you're"
-  echo "* going to use SSL or not, we need to know which webserver configuration to use."
-  echo "* If you're unsure, use (no). "
-  echo -n "* Assume SSL or not? (yes/no): "
-  read ASSUME_SSL_INPUT
-
-  if [ "$ASSUME_SSL_INPUT" == "yes" ]; then
-    ASSUME_SSL=true
-  elif [ "$ASSUME_SSL_INPUT" == "no" ]; then
-    ASSUME_SSL=false
-  else
-    print_error "Invalid answer. Value set to no."
-    ASSUME_SSL=false
-  fi
 
   # confirm installation
   echo -e -n "\n* Inital configuration done. Do you wan't to continue with the installation? (y/n): "
