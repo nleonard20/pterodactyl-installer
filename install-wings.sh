@@ -77,7 +77,7 @@ function detect_os_version {
 
 function check_os_comp {
   if [ "$OS" == "ubuntu" ]; then
-    elif [ "$OS_VERSION" == "18" ]; then
+    if [ "$OS_VERSION" == "18" ]; then
       SUPPORTED=true
     elif [ "$OS_VERSION" == "20" ]; then
       SUPPORTED=true
