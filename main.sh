@@ -20,3 +20,5 @@ function main {
   bash <(curl -s https://raw.githubusercontent.com/valkam08/pterodactyl-installer/${VERSION}/install-panel-${VERSION}.sh)
 
 }
+
+main
