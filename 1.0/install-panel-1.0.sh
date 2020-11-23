@@ -1,7 +1,7 @@
 #!/bin/bash
 ###########################################################
-# pterodactyl-installer for panel
-# Copyright Valkam 2019-2020
+# pterodactyl panel latest version
+# Copyright Valkam 2019-2021
 #
 # https://github.com/valkam08/pterodactyl-installer
 ###########################################################

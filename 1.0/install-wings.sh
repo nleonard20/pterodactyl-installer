@@ -1,6 +1,6 @@
 #!/bin/bash
 ###########################################################
-# pterodactyl-installer for daemon
+# pterodactyl-installer for wings
 # Copyright Vilhelm Prytz 2018-2019
 #
 # https://github.com/Valkam08/pterodactyl-installer
@@ -36,13 +36,13 @@ get_latest_release() {
 }
 
 echo "* Retrieving release information.."
-VERSION="$(get_latest_release "pterodactyl/daemon")"
+VERSION="$(get_latest_release "pterodactyl/wings")"
 
 echo "* Latest version is $VERSION"
 
 # DL urls
-DL_URL="https://github.com/pterodactyl/daemon/releases/download/$VERSION/daemon.tar.gz"
-CONFIGS_URL="https://raw.githubusercontent.com/Valkam08/pterodactyl-installer/master/configs"
+DL_URL="https://github.com/pterodactyl/wings/releases/download/$VERSION/wings_linux_amd64"
+CONFIGS_URL="https://raw.githubusercontent.com/Valkam08/pterodactyl-installer/master/1.0"
 
 # variables
 OS="debian"
@@ -77,9 +77,9 @@ function detect_os_version {
 
 function check_os_comp {
   if [ "$OS" == "ubuntu" ]; then
-    if [ "$OS_VERSION" == "16" ]; then
+    if [ "$OS_VERSION" == "18" ]; then
       SUPPORTED=true
-    elif [ "$OS_VERSION" == "18" ]; then
+    elif [ "$OS_VERSION" == "20" ]; then
       SUPPORTED=true
     else
       SUPPORTED=false
@@ -94,6 +94,8 @@ function check_os_comp {
     fi
   elif [ "$OS" == "centos" ]; then
     if [ "$OS_VERSION" == "7" ]; then
+      SUPPORTED=true
+    elif [ "$OS_VERSION" == "8" ]; then
       SUPPORTED=true
     else
       SUPPORTED=false
@@ -120,27 +122,9 @@ function yum_update {
 }
 
 function apt_update {
-  apt update -y
-  apt upgrade -y
+  apt update -y && apt upgrade -y
 }
 
-function install_dep {
-  if [ "$OS" == "debian" ] || [ "$OS" == "ubuntu" ]; then
-    apt_update
-
-    # install dependencies
-    apt -y install tar unzip make gcc g++ python
-  elif [ "$OS" == "centos" ]; then
-    yum_update
-
-    # install dependencies
-    yum -y install tar unzip make gcc
-    yum -y install gcc-c++
-  else
-    print_error "Invalid OS."
-    exit 1
-  fi
-}
 function install_docker {
   echo "* Installing docker .."
   if [ "$OS" == "debian" ]; then
@@ -224,23 +208,13 @@ function install_docker {
   echo "* Docker has now been installed."
 }
 
-function install_nodejs {
-  if [ "$OS" == "debian" ] || [ "$OS" == "ubuntu" ]; then
-    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-    apt -y install nodejs
-  elif [ "$OS" == "centos" ]; then
-    curl --silent --location https://rpm.nodesource.com/setup_12.x | sudo bash -
-    yum -y install nodejs
-  fi
-}
+function install_wings {
+  echo "* Installing pterodactyl wings .. "
+  mkdir -p /etc/pterodactyl
+  cd /srv/wings
 
-function ptdl_dl {
-  echo "* Installing pterodactyl daemon .. "
-  mkdir -p /srv/daemon /srv/daemon-data
-  cd /srv/daemon
-
-  curl -L $DL_URL | tar --strip-components=1 -xzv
-  npm install --only=production
+  curl -L -o /usr/local/bin/wings $DL_URL
+  chmod u+x /usr/local/bin/wings
 
   echo "* Done."
 }
@@ -248,8 +222,7 @@ function ptdl_dl {
 function systemd_file {
   echo "* Installing systemd service.."
   curl -o /etc/systemd/system/wings.service $CONFIGS_URL/wings.service
-  systemctl daemon-reload
-  systemctl enable wings
+  systemctl enable --now wings
   echo "* Installed systemd service!"
 }
 
@@ -257,17 +230,15 @@ function systemd_file {
 ## MAIN FUNCTIONS ##
 ####################
 function perform_install {
-  echo "* Installing pterodactyl daemon.."
-  install_dep
+  echo "* Installing pterodactyl wings.."
   install_docker
-  install_nodejs
-  ptdl_dl
+  install_wings
   systemd_file
 }
 
 function main {
   print_brake 42
-  echo "* Pterodactyl daemon installation script "
+  echo "* Pterodactyl wings installation script "
   echo "* Detecting operating system."
   OS=$(detect_distro);
   OS_VERSION=$(detect_os_version);
@@ -277,11 +248,11 @@ function main {
   # checks if the system is compatible with this installation script
   check_os_comp
 
-  echo "* The installer will install Docker, required dependencies for the daemon"
-  echo "* as well as the daemon itself. But it is still required to create the node"
+  echo "* The installer will install Docker, required dependencies for the wings"
+  echo "* as well as the wings itself. But it is still required to create the node"
   echo "* on the panel and then place the configuration on the node after the"
   echo "* installation has finished. Read more about the process:"
-  echo "* https://pterodactyl.io/daemon/installing.html#configure-daemon"
+  echo "* https://pterodactyl.io/wings/installing.html#configure-wings"
   print_brake 42
   echo -n "* Proceed with installation? (y/n): "
 
@@ -303,7 +274,7 @@ function goodbye {
   echo "* Installation finished."
   echo ""
   echo "* Make sure you create the node within the panel and then "
-  echo "* copy the config to the node. You may then start the daemon using "
+  echo "* copy the config to the node. You may then start the wings using "
   echo "* systemctl start wings"
   echo "* NOTE: It is recommended to also enable swap (for docker)."
   print_brake 70

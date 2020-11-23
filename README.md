@@ -19,7 +19,7 @@ List of supported installation setups for panel and daemon (installations suppor
 | Debian            | 9       | :white_check_mark: | :white_check_mark:   |
 |                   | 10       | :white_check_mark: | :white_check_mark:   |
 
-### Supported daemon operating systems
+### Supported wings/daemon operating systems
 
 | Operating System  | Version | Supported          |
 | ----------------- | ------- | ------------------ |
@@ -36,15 +36,7 @@ Using the Pterodactyl Panel installation script:
 
 `apt install sudo curl python`
 
-`bash <(curl -s https://raw.githubusercontent.com/valkam08/pterodactyl-installer/master/install-panel.sh)`
-
-Using the Pterodactyl Wings installation script:
-
-`bash <(curl -s https://raw.githubusercontent.com/valkam08/pterodactyl-installer/master/install-wings.sh)`
-
-Using the Pterodactyl Daemon installation script:
-
-`bash <(curl -s https://raw.githubusercontent.com/valkam08/pterodactyl-installer/master/install-daemon.sh)`
+`bash <(curl -s https://raw.githubusercontent.com/valkam08/pterodactyl-installer/master/main.sh)`
 
 The script will guide you through the install.
 
